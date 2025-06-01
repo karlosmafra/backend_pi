@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const Usuario = require('../models/usuario')
 
 // ROTAS
 
@@ -10,9 +11,8 @@ router.get('/', (req, res) => {
 
 // Rota que retorna TODOS os usuários da aplicação
 router.get('/usuarios', async (req, res) => {    
-    //const usuarios = await Usuario.findAll();
-    //res.json(usuarios);
-    res.send('Get todos usuários a ser implementado')
+    const usuarios = await Usuario.findAll();
+    res.json(usuarios);
 });
 
 
@@ -34,19 +34,19 @@ router.get('/usuario/:id_usuario', async (req, res) => {
 // Rota que cria um usuário
 router.post('/usuario', async (req, res) => {
 
-    const { nome, telefone, email, senha, tipo } = req.body;
+    const { nome, telefone, email, senha, role_id } = req.body;
 
     // 1. Validação básica
-    if (!nome || !telefone || !email || !senha || !tipo) {
+    if (!nome || !telefone || !email || !senha || !role_id) {
         return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios.' });
     }
 
+    // 2. Verificar se o e-mail já está cadastrado 
     /*
-    // 2. Verificar se o e-mail já está cadastrado
     const usuarioExistente = await Usuario.findOne({ email });
     if (usuarioExistente) {
         return res.status(409).json({ mensagem: 'E-mail já cadastrado.' });
-    }
+    } */
 
     // 3. Criar o novo usuário (fazer hash da senha com criptografia)
     const novoUsuario = new Usuario({
@@ -54,7 +54,7 @@ router.post('/usuario', async (req, res) => {
         telefone,
         email,
         senha,
-        tipo
+        role_id
     });
 
     await novoUsuario.save();
@@ -65,16 +65,11 @@ router.post('/usuario', async (req, res) => {
         usuario: {
         id: novoUsuario._id,
         nome: novoUsuario.nome,
+        telefone: novoUsuario.telefone,
         email: novoUsuario.email,
-        tipo: novoUsuario.tipo
+        role_id: novoUsuario.role_id
         }
-    });
-    */
-
-   console.log(req.body)
-    res.status(201).json({
-    mensagem: 'Usuário cadastrado com sucesso'
-    });
+    })
 
 })
 
